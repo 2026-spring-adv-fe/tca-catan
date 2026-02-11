@@ -9,6 +9,7 @@ function App() {
   return (
     <div
       className='p-3'
+      data-theme='dark'
     >
       <div>
         <a href="https://vite.dev" target="_blank">
@@ -30,7 +31,7 @@ function App() {
       <p className="read-the-docs">
         Click on the Vite and React logos to learn more
       </p>
-      <div className="card bg-base-100 w-full shadow-lg my-3">
+      <div className="card bg-base-100 w-full shadow-lg my-5">
   <div className="card-body p-2">
     <h2 className="card-title">Leaderboard!</h2>
     <p>A card component has a figure, a body part, and inside body there are title and actions parts</p>
@@ -38,29 +39,91 @@ function App() {
 </div>
 
 
-<div className="card bg-base-100 w-full shadow-lg my-3">
+<div className="card bg-base-100 w-full shadow-lg my-5">
   <div className="card-body p-2">
     <h2 className="card-title">Leaderboard!</h2>
     <p>A card component has a figure, a body part, and inside body there are title and actions parts</p>
   </div>
 </div>
 
-<div className="card bg-base-100 w-full shadow-lg my-3">
+<div className="card bg-base-100 w-full shadow-lg my-5">
   <div className="card-body p-2">
     <h2 className="card-title">Leaderboard!</h2>
     <p>A card component has a figure, a body part, and inside body there are title and actions parts</p>
   </div>
 </div>
 
-
-<div className="card bg-base-100 w-full shadow-lg my-3">
+<div className="card bg-base-100 w-full shadow-lg my-5">
   <div className="card-body p-2">
     <h2 className="card-title">Leaderboard!</h2>
     <p>A card component has a figure, a body part, and inside body there are title and actions parts</p>
   </div>
 </div>
 
-<div className="card bg-base-100 w-full shadow-lg my-3">
+<div className="card bg-base-100 w-full shadow-lg my-5">
+  <div className="card-body p-2">
+    <h2 className="card-title">Leaderboard!</h2>
+    
+
+    <span className="text-rotate text-7xl">
+  <span className="justify-items-center">
+    <span>DESIGN</span>
+    <span>DEVELOP</span>
+    <span>DEPLOY</span>
+    <span>SCALE</span>
+    <span>MAINTAIN</span>
+    <span>REPEAT</span>
+  </span>
+</span>
+
+
+  </div>
+</div>
+
+
+<div className="card bg-base-100 w-full shadow-lg my-5">
+  <div className="card-body p-2">
+    <h2 className="card-title">Leaderboard!</h2>
+    
+
+    <a href="#" className="hover-3d my-12 mx-2 cursor-pointer">
+  
+  {/* content */}
+  <div className="card w-96 bg-black text-white bg-[radial-gradient(circle_at_bottom_left,#ffffff04_35%,transparent_36%),radial-gradient(circle_at_top_right,#ffffff04_35%,transparent_36%)] bg-size-[4.95em_4.95em]">
+    <div className="card-body">
+      <div className="flex justify-between mb-10">
+        <div className="font-bold">BANK OF LATVERIA</div>
+        <div className="text-5xl opacity-10">❁</div>
+      </div>
+      <div className="text-lg mb-4 opacity-40">0210 8820 1150 0222</div>
+      <div className="flex justify-between">
+        <div>
+          <div className="text-xs opacity-20">CARD HOLDER</div>
+          <div>VICTOR VON D.</div>
+        </div>
+        <div>
+          <div className="text-xs opacity-20">EXPIRES</div>
+          <div>29/08</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  {/* 8 empty divs needed for the 3D effect */}
+  <div></div>
+  <div></div>
+  <div></div>
+  <div></div>
+  <div></div>
+  <div></div>
+  <div></div>
+  <div></div>
+</a>
+
+  </div>
+</div>
+
+<div className="card bg-base-100 w-full shadow-lg my-5">
   <div className="card-body p-2">
     <h2 className="card-title">Leaderboard!</h2>
     
@@ -166,7 +229,7 @@ function App() {
 </div>
 
 
-<div className="card bg-base-100 w-full shadow-lg my-3">
+<div className="card bg-base-100 w-full shadow-lg my-5">
   <div className="card-body p-2">
     <h2 className="card-title">Leaderboard!</h2>
    
