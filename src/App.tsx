@@ -3,8 +3,13 @@ import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
 
-function App() {
-  const [count, setCount] = useState(0)
+
+type AppProps = {
+  initialCountValue: number;
+  foo?: string;
+};
+const App: React.FC<AppProps> = ({initialCountValue, foo,}) => {
+  const [count, setCount] = useState(initialCountValue)
 
   return (
     <div
@@ -20,6 +25,7 @@ function App() {
         </a>
       </div>
       <h1 className='text-3xl font-bold'>Vite + React</h1>
+      <p>{foo}</p>
       <div className="card">
         <button onClick={() => setCount((count) => count + 1)} className='btn btn-lg btn-outline btn-primary w-full lg:w-64 my-5'>
           count is {count}
@@ -41,7 +47,7 @@ function App() {
 
 <div className="card bg-base-100 w-full shadow-lg my-5">
   <div className="card-body p-2">
-    <h2 className="card-title">Leaderboard!</h2>
+    <h2 className="card-title">{count}</h2>
     <p>A card component has a figure, a body part, and inside body there are title and actions parts</p>
   </div>
 </div>
