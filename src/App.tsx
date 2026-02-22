@@ -1,6 +1,8 @@
 import { HashRouter, Routes, Route, } from 'react-router'
 import './App.css'
-const Home = () => <h1>Home</h1>;
+
+import { Home } from './Home'
+
 const Setup = () => <h1>Setup</h1>
 const Play = () => <h1>Play</h1>
 
