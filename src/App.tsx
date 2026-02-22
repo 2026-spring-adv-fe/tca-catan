@@ -3,8 +3,8 @@ import './App.css'
 
 import { Home } from './Home'
 import { Setup } from './Setup'
+import { Play } from './Play'
 
-const Play = () => <h1>Play</h1>
 
 const App = () => {
 
