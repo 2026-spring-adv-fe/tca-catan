@@ -1,10 +1,12 @@
 import { HashRouter, Routes, Route, } from 'react-router'
 import './App.css'
-import { GameResult } from './GameResults'
+
 
 import { Home } from './Home'
 import { Setup } from './Setup'
 import { Play } from './Play'
+import { getGeneralFacts, type GameResult } from './GameResults'
+import { useState } from 'react'
 
 const dummyGameResults: GameResult[] = [
     {
@@ -32,6 +34,8 @@ const dummyGameResults: GameResult[] = [
 
 const App = () => {
 
+  const [GameResults, setGameResults] = useState(dummyGameResults);
+
   return (
     <div>
       <HashRouter>
@@ -39,7 +43,10 @@ const App = () => {
           <Route 
             path='/'
             element={
-              <Home />
+              <Home generalFacts={
+                getGeneralFacts(GameResults)
+              }
+              />
             }
           />
           <Route 

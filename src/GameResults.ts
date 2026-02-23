@@ -19,7 +19,7 @@ export type GeneralFacts = {
 //
 //  Exported funcs...
 //
-const getGeneralFacts = (games: GameResult[]): GeneralFacts => {
+export const getGeneralFacts = (games: GameResult[]): GeneralFacts => {
 
     const now = Date.now();
 
