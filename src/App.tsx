@@ -1,9 +1,33 @@
 import { HashRouter, Routes, Route, } from 'react-router'
 import './App.css'
+import { GameResult } from './GameResults'
 
 import { Home } from './Home'
 import { Setup } from './Setup'
 import { Play } from './Play'
+
+const dummyGameResults: GameResult[] = [
+    {
+        winner: "Harry",
+        players: [
+            "Harry",
+            "Hermione",
+            "Ron",
+        ],
+        start: "2026-02-01T18:53:59.078Z",
+        end: "2026-02-01T19:27:59.078Z",
+    },
+    {
+        winner: "Hermione",
+        players: [
+            "Harry",
+            "Hermione",
+            "Ron",
+        ],
+        start: "2026-01-15T22:07:59.078Z",
+        end: "2026-01-15T23:01:59.078Z",
+    },  
+];
 
 
 const App = () => {
