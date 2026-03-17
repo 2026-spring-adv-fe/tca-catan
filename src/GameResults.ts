@@ -1,3 +1,5 @@
+import { durationFormatter } from 'human-readable';
+
 //
 // Exported type definitions...
 //
@@ -17,9 +19,18 @@ export type GeneralFacts = {
 };
 
 //
-//  Exported funcs...
+// Exported funcs...
 //
 export const getGeneralFacts = (games: GameResult[]): GeneralFacts => {
+
+    if (games.length === 0) {
+        return {
+            lastPlayed: "N/A",
+            totalGames: 0,
+            shortestGame: "N/A",
+            longestGame: "N/A",
+        };
+    }
 
     const now = Date.now();
 
@@ -40,13 +51,34 @@ export const getGeneralFacts = (games: GameResult[]): GeneralFacts => {
     // );
 
     return {
-        lastPlayed: `${mostRecentlyPlayedInMilliseconds / 1000 / 60 / 60/ 24} days ago`,
+        lastPlayed: `${formatLastPlayed(
+            mostRecentlyPlayedInMilliseconds
+        )} ago`,
         totalGames: games.length,
-        shortestGame: `${Math.min(...gameDurationsInMilliseconds) / 1000 / 60} minutes`,
-        longestGame: `${Math.max(...gameDurationsInMilliseconds) / 1000 / 60} minutes`,
+        shortestGame: formatGameDuration(
+            Math.min(
+                ...gameDurationsInMilliseconds
+            ),
+         ),
+        longestGame: formatGameDuration(
+            Math.max(
+                ...gameDurationsInMilliseconds
+            ),
+         ),         
     };
 };
 
 //
-//  Helper funcs...
+// Helper funcs...
 //
+const formatGameDuration = durationFormatter<string>();
+
+const formatLastPlayed = durationFormatter<string>(
+    {
+        allowMultiples: [
+            "y",
+            "mo",
+            "d",
+        ],
+    }
+);

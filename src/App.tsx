@@ -1,12 +1,15 @@
-import { HashRouter, Routes, Route, } from 'react-router'
 import './App.css'
+import { 
+  HashRouter,
+  Routes,
+  Route, 
+} from 'react-router';
+import { Home } from './Home';
+import { Setup } from './Setup';
+import { Play } from './Play';
+import { getGeneralFacts, type GameResult } from './GameResults';
+import { useState } from 'react';
 
-
-import { Home } from './Home'
-import { Setup } from './Setup'
-import { Play } from './Play'
-import { getGeneralFacts, type GameResult } from './GameResults'
-import { useState } from 'react'
 
 const dummyGameResults: GameResult[] = [
     {
@@ -31,22 +34,27 @@ const dummyGameResults: GameResult[] = [
     },  
 ];
 
-
 const App = () => {
 
-  // React hooks
-
+  //
+  // React hooks...
+  //
   const [gameResults, setGameResults] = useState(dummyGameResults);
-  
+  // const [gameResults, setGameResults] = useState([]);
 
+  //
   // Calculated state and other funcs...
+  //
   const addNewGameResult = (gameResult: GameResult) => setGameResults(
     [
       ...gameResults,
       gameResult,
     ]
   );
-  //return jsx
+
+  //
+  // Return JSX...
+  //
   return (
     <div>
       <HashRouter>
@@ -54,9 +62,10 @@ const App = () => {
           <Route 
             path='/'
             element={
-              <Home generalFacts={
-                getGeneralFacts(gameResults)
-              }
+              <Home
+                generalFacts={
+                  getGeneralFacts(gameResults)
+                } 
               />
             }
           />
@@ -75,7 +84,7 @@ const App = () => {
                 }
               />
             }
-          />
+          />          
         </Routes>
       </HashRouter>
     </div>
