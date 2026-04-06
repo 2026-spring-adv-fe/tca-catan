@@ -1,22 +1,22 @@
 import { useNavigate } from "react-router";
 import type { GeneralFacts, LeaderboardEntry } from "./GameResults";
+import { } from "human-readable";
 import { useEffect } from "react";
 
-export const APP_TITLE = "UM Companion";
+export const APP_TITLE = "Connect 4 Companion App";
 
 type HomeProps = {
-    generalFacts: GeneralFacts,
+    generalFacts: GeneralFacts;
     leaderboard: LeaderboardEntry[],
-    setTitle: (t: string) => void,
+    setTitle: (t: string) => void;
 };
-
 
 export const Home: React.FC<HomeProps> = ({
     generalFacts,
     leaderboard,
     setTitle,
 }) => {
-    
+
     useEffect(
         () => setTitle(APP_TITLE),
         [],
@@ -28,7 +28,7 @@ export const Home: React.FC<HomeProps> = ({
     // Then return JSX...
     return (
         <>
-            <button 
+            <button
                 className="btn btn-soft btn-lg w-full lg:w-64"
                 onClick={
                     () => nav('/setup')
@@ -37,13 +37,12 @@ export const Home: React.FC<HomeProps> = ({
                 Setup a Game
             </button>
 
+
             <div className="card bg-base-100 w-full shadow-lg my-5 overflow-x-scroll">
                 <div className="card-body p-2">
                     <h2 
                         className="card-title text-nowrap"
-                    >
-                        General Facts
-                    </h2>
+                    >General Facts</h2>
                     <table className="table table-zebra">
                         <tbody>
                             <tr>
@@ -62,10 +61,23 @@ export const Home: React.FC<HomeProps> = ({
                                 <td>Longest Game</td>
                                 <th>{generalFacts.longestGame}</th>
                             </tr>
+                            <tr>
+                                <td>AVG Turns / Game</td>
+                                <th>{generalFacts.avgTurnsPerGame}</th>
+                            </tr>
+                            <tr>
+                                <td>Shortest Turn</td>
+                                <th>{generalFacts.shortestTurn}</th>
+                            </tr>
+                            <tr>
+                                <td>Longest Turn</td>
+                                <th>{generalFacts.longestTurn}</th>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
-            </div>          
+            </div>
+
             <div className="card bg-base-100 w-full shadow-lg my-5 overflow-x-scroll">
                 <div className="card-body p-2">
                     <h2 
@@ -94,16 +106,16 @@ export const Home: React.FC<HomeProps> = ({
                                                         key={x.name}
                                                     >
                                                         <td>
-                                                            { x.wins }
+                                                            {x.wins}
                                                         </td>
                                                         <td>
-                                                            { x.losses }
+                                                            {x.losses}
                                                         </td>
                                                         <td>
-                                                            { x.avg }
+                                                            {x.avg}
                                                         </td>
                                                         <td>
-                                                            { x.name }
+                                                            {x.name}
                                                         </td>
                                                     </tr>
                                                 )
@@ -112,12 +124,9 @@ export const Home: React.FC<HomeProps> = ({
                                     </tbody>
                                 </table>
                             )
-                    }
+                        }
                 </div>
-            </div>       
-
-
-
+            </div>
         </>
     );
 };

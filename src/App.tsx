@@ -1,43 +1,57 @@
 import './App.css'
-import { 
+import {
   HashRouter,
   Routes,
-  Route, 
+  Route,
 } from 'react-router';
 import { APP_TITLE, Home } from './Home';
 import { Setup } from './Setup';
 import { Play } from './Play';
-import { 
-  getGeneralFacts, 
-  getLeaderboard, 
-  type GameResult, 
-} from './GameResults';
+import { getGeneralFacts, getLeaderboard, getPreviousPlayers, type GameResult } from './GameResults';
 import { useEffect, useState } from 'react';
 import localforage from 'localforage';
 
 const DEFAULT_THEME = "light";
 
 const dummyGameResults: GameResult[] = [
-    {
-        winner: "Harry",
-        players: [
-            "Harry",
-            "Hermione",
-            "Ron",
-        ],
-        start: "2026-02-01T18:53:59.078Z",
-        end: "2026-02-01T19:27:59.078Z",
-    },
-    {
-        winner: "Hermione",
-        players: [
-            "Harry",
-            "Hermione",
-            "Ron",
-        ],
-        start: "2026-01-15T22:07:59.078Z",
-        end: "2026-01-15T23:01:59.078Z",
-    },  
+  {
+    winner: "Harry",
+    players: [
+      "Harry",
+      "Hermione",
+    ],
+    start: "2026-02-01T18:53:59.078Z",
+    end: "2026-02-01T19:27:59.078Z",
+    turnEndTimestamps: [
+      "2026-02-01T18:57:22.078Z",
+      "2026-02-01T19:01:45.078Z",
+      "2026-02-01T19:04:10.078Z",
+      "2026-02-01T19:12:33.078Z",
+      "2026-02-01T19:15:07.078Z",
+      "2026-02-01T19:22:41.078Z",
+      "2026-02-01T19:27:59.078Z",
+    ],
+  },
+  {
+    winner: "Hermione",
+    players: [
+      "Hermione",
+      "Ron",
+    ],
+    start: "2026-01-15T22:07:59.078Z",
+    end: "2026-01-15T23:01:59.078Z",
+    turnEndTimestamps: [
+      "2026-01-15T22:12:14.078Z",
+      "2026-01-15T22:18:30.078Z",
+      "2026-01-15T22:21:05.078Z",
+      "2026-01-15T22:30:42.078Z",
+      "2026-01-15T22:35:19.078Z",
+      "2026-01-15T22:42:55.078Z",
+      "2026-01-15T22:48:11.078Z",
+      "2026-01-15T22:55:30.078Z",
+      "2026-01-15T23:01:59.078Z",
+    ],
+  },
 ];
 
 const App = () => {
@@ -50,31 +64,33 @@ const App = () => {
 
   const [title, setTitle] = useState(APP_TITLE);
 
-  const [theme, setTheme] = useState(DEFAULT_THEME);
+  const [theme, setTheme] = useState("light");
+
+  // const [currentPlayers, setCurrentPlayers] = useState<string[]>([]);
+  const currentPlayersStateTuple = useState<string[]>([]);
 
   useEffect(
     () => {
-      const loadTheme = async () => {
+    const loadTheme = async () => {
+      const result = await localforage.getItem<string>("theme") ?? "light";
 
-        const result = await localforage.getItem<string>("theme") ?? DEFAULT_THEME;
-
-        if (!ignore) {
-          setTheme(result);
-        }
+      if (!ignore) {
+        setTheme(result);
       }
+    }
 
-      let ignore = false;
-      loadTheme();
+    let ignore = false;
+    loadTheme();
 
-      return () => {
-        ignore = true;
-      }
-    }, 
-    [],
-  );  
+    return () => {
+      ignore = true;
+    }
+  }, 
+  [],
+);
 
   //
-  // Calculated state and other funcs...
+  // Calculate state and other funcs...
   //
   const addNewGameResult = (gameResult: GameResult) => setGameResults(
     [
@@ -89,34 +105,28 @@ const App = () => {
   return (
     <div
       className='min-h-screen'
-      data-theme={ theme }
+      data-theme={theme}
     >
-      <div 
-        className="navbar bg-neutral text-neutral-content overflow-x-hidden flex flex-row"
+      <div className="navbar bg-neutral text-neutral-content overflow-x-hidden flex flex-row"
       >
         <p
-          className='text-xl font-bold text-nowrap'
+          className="text-xl font-bold text-nowrap"
         >
-          {
-            title
-          }
+          {title}
         </p>
-        <label 
+        <label
           className="swap swap-rotate ml-auto"
         >
           {/* this hidden checkbox controls the state */}
-          <input 
-            type="checkbox" 
-            checked={
-              DEFAULT_THEME !== theme
-            }
+          <input
+            type="checkbox"
             onClick={
               async () => {
                 const result = await localforage.setItem<string>(
                   'theme',
                   theme === DEFAULT_THEME
                     ? "dark"
-                    : DEFAULT_THEME,
+                    : "light",
                 );
 
                 setTheme(
@@ -145,44 +155,51 @@ const App = () => {
           </svg>
         </label>
       </div>
-      <div 
-        className="p-3"
+      <div
+        className="text-xl font-bold text-nowrap"
       >
+
+
         <HashRouter>
           <Routes>
-            <Route 
+            <Route
               path='/'
               element={
                 <Home
                   setTitle={setTitle}
                   generalFacts={
                     getGeneralFacts(gameResults)
-                  } 
+                  }
                   leaderboard={
                     getLeaderboard(gameResults)
                   }
                 />
               }
             />
-            <Route 
+            <Route
               path='/setup'
               element={
-                <Setup 
+                <Setup
                   setTitle={setTitle}
+                  previousPlayers={
+                    getPreviousPlayers(gameResults)
+                  }
+                  setCurrentPlayers={currentPlayersStateTuple[1]}
                 />
               }
             />
-            <Route 
+            <Route
               path='/play'
               element={
-                <Play 
+                <Play
                   setTitle={setTitle}
                   addNewGameResult={
                     addNewGameResult
                   }
+                  players={currentPlayersStateTuple[0]}
                 />
               }
-            />          
+            />
           </Routes>
         </HashRouter>
       </div>

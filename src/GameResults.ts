@@ -1,4 +1,4 @@
-import { durationFormatter } from 'human-readable';
+import { durationFormatter } from "human-readable";
 
 //
 // Exported type definitions...
@@ -9,6 +9,20 @@ export type GameResult = {
 
     start: string;
     end: string;
+
+    // Keep timestamps each time the turn is changed...
+    // For example: ["20260401T13:12:22:234", "20260401T13:15:22:234"]
+    turnEndTimestamps: string[];
+};
+
+export type GeneralFacts = {
+    lastPlayed: string;
+    totalGames: number;
+    shortestGame: string;
+    longestGame: string;
+    avgTurnsPerGame: string;
+    shortestTurn: string;
+    longestTurn: string;
 };
 
 export type LeaderboardEntry = {
@@ -18,15 +32,8 @@ export type LeaderboardEntry = {
     name: string;
 };
 
-export type GeneralFacts = {
-    lastPlayed: string;
-    totalGames: number;
-    shortestGame: string;
-    longestGame: string;
-};
-
 //
-// Exported funcs...
+// Exported functions...
 //
 export const getGeneralFacts = (games: GameResult[]): GeneralFacts => {
 
@@ -36,6 +43,9 @@ export const getGeneralFacts = (games: GameResult[]): GeneralFacts => {
             totalGames: 0,
             shortestGame: "N/A",
             longestGame: "N/A",
+            avgTurnsPerGame: "N/A",
+            shortestTurn: "N/A",
+            longestTurn: "N/A",
         };
     }
 
@@ -53,6 +63,10 @@ export const getGeneralFacts = (games: GameResult[]): GeneralFacts => {
         x => Date.parse(x.end) - Date.parse(x.start)
     );
 
+    const totalTurns = games.reduce(
+        (acc, x) => acc + x.turnEndTimestamps.length,
+        0,
+    );
     // console.log(
     //     gamesLastPlayedAgoInMilliseconds
     // );
@@ -62,16 +76,14 @@ export const getGeneralFacts = (games: GameResult[]): GeneralFacts => {
             mostRecentlyPlayedInMilliseconds
         )} ago`,
         totalGames: games.length,
-        shortestGame: formatGameDuration(
-            Math.min(
-                ...gameDurationsInMilliseconds
-            ),
-         ),
-        longestGame: formatGameDuration(
-            Math.max(
-                ...gameDurationsInMilliseconds
-            ),
-         ),         
+        shortestGame: formatDuration(
+            Math.min(...gameDurationsInMilliseconds) 
+        ),
+        longestGame: formatDuration(
+            Math.max(...gameDurationsInMilliseconds) 
+        ),
+        avgTurnsPerGame: (totalTurns / games.length).toFixed(2),
+        ...getTurnDurations(games),
     };
 };
 
@@ -95,10 +107,50 @@ export const getLeaderboard = (
     )
 ;
 
+export const getPreviousPlayers = (
+    games: GameResult[]
+) => games 
+    .flatMap(
+        x => x.players
+    )
+    .filter(
+        (x, i, a) => i == a.findIndex(
+            y => y == x
+        )
+    )
+    .sort(
+        (a, b) => a.localeCompare(b)
+    )
+;
+
 //
-// Helper funcs...
+// Helper functions...
 //
-const formatGameDuration = durationFormatter<string>();
+const formatDuration = durationFormatter<string>();
+
+const getTurnDurations = (games: GameResult[]): Pick<GeneralFacts, "shortestTurn" | "longestTurn"> => {
+    const allTurnDurations = games.flatMap(game => {
+        if (game.turnEndTimestamps.length === 0) {
+            return [];
+        }
+
+        return [
+            Date.parse(game.turnEndTimestamps[0]) - Date.parse(game.start),
+            ...game.turnEndTimestamps.slice(1).map((timestamp, index) =>
+                Date.parse(timestamp) - Date.parse(game.turnEndTimestamps[index])
+            ),
+        ];
+    });
+
+    if (allTurnDurations.length === 0) {
+        return { shortestTurn: "N/A", longestTurn: "N/A" };
+    }
+
+    return {
+        shortestTurn: formatDuration(Math.min(...allTurnDurations)),
+        longestTurn: formatDuration(Math.max(...allTurnDurations)),
+    };
+};
 
 const formatLastPlayed = durationFormatter<string>(
     {
@@ -135,22 +187,7 @@ const getLeaderboardEntry = (
         losses: totalGames - countOfWins,
         avg: `${avg.toFixed(3)}`,
         name: player
-
     };
 };
 
-const getPreviousPlayers = (
-    games: GameResult[]
-) => games 
-    .flatMap(
-        x => x.players
-    )
-    .filter(
-        (x, i, a) => i == a.findIndex(
-            y => y == x
-        )
-    )
-    .sort(
-        (a, b) => a.localeCompare(b)
-    )
-;
+
