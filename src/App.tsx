@@ -13,7 +13,8 @@ import localforage from 'localforage';
 
 const DEFAULT_THEME = "light";
 
-const dummyGameResults: GameResult[] = [
+const dummyGameResults: GameResult[] = [ 
+  
   {
     winner: "Harry",
     players: [
