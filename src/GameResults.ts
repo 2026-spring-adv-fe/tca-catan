@@ -1,28 +1,19 @@
-import { durationFormatter } from "human-readable";
+import { durationFormatter } from 'human-readable';
 
 //
 // Exported type definitions...
 //
+export type Player = {
+    name: string,
+    fighter: string,
+};
+
 export type GameResult = {
     winner: string;
-    players: string[];
+    players: Player[];
 
     start: string;
     end: string;
-
-    // Keep timestamps each time the turn is changed...
-    // For example: ["20260401T13:12:22:234", "20260401T13:15:22:234"]
-    turnEndTimestamps: string[];
-};
-
-export type GeneralFacts = {
-    lastPlayed: string;
-    totalGames: number;
-    shortestGame: string;
-    longestGame: string;
-    avgTurnsPerGame: string;
-    shortestTurn: string;
-    longestTurn: string;
 };
 
 export type LeaderboardEntry = {
@@ -32,8 +23,15 @@ export type LeaderboardEntry = {
     name: string;
 };
 
+export type GeneralFacts = {
+    lastPlayed: string;
+    totalGames: number;
+    shortestGame: string;
+    longestGame: string;
+};
+
 //
-// Exported functions...
+// Exported funcs...
 //
 export const getGeneralFacts = (games: GameResult[]): GeneralFacts => {
 
@@ -43,9 +41,6 @@ export const getGeneralFacts = (games: GameResult[]): GeneralFacts => {
             totalGames: 0,
             shortestGame: "N/A",
             longestGame: "N/A",
-            avgTurnsPerGame: "N/A",
-            shortestTurn: "N/A",
-            longestTurn: "N/A",
         };
     }
 
@@ -63,10 +58,6 @@ export const getGeneralFacts = (games: GameResult[]): GeneralFacts => {
         x => Date.parse(x.end) - Date.parse(x.start)
     );
 
-    const totalTurns = games.reduce(
-        (acc, x) => acc + x.turnEndTimestamps.length,
-        0,
-    );
     // console.log(
     //     gamesLastPlayedAgoInMilliseconds
     // );
@@ -76,14 +67,16 @@ export const getGeneralFacts = (games: GameResult[]): GeneralFacts => {
             mostRecentlyPlayedInMilliseconds
         )} ago`,
         totalGames: games.length,
-        shortestGame: formatDuration(
-            Math.min(...gameDurationsInMilliseconds) 
-        ),
-        longestGame: formatDuration(
-            Math.max(...gameDurationsInMilliseconds) 
-        ),
-        avgTurnsPerGame: (totalTurns / games.length).toFixed(2),
-        ...getTurnDurations(games),
+        shortestGame: formatGameDuration(
+            Math.min(
+                ...gameDurationsInMilliseconds
+            ),
+         ),
+        longestGame: formatGameDuration(
+            Math.max(
+                ...gameDurationsInMilliseconds
+            ),
+         ),         
     };
 };
 
@@ -113,6 +106,9 @@ export const getPreviousPlayers = (
     .flatMap(
         x => x.players
     )
+    .map(
+        x => x.name
+    )
     .filter(
         (x, i, a) => i == a.findIndex(
             y => y == x
@@ -123,34 +119,119 @@ export const getPreviousPlayers = (
     )
 ;
 
-//
-// Helper functions...
-//
-const formatDuration = durationFormatter<string>();
+export const getFighterLeaderboard = (
+    games: GameResult[]
+): LeaderboardEntry[] => getPreviousFighters(games)
+    .map(
+        x => ({
+            ...getFighterLeaderboardEntry(
+                games,
+                x,
+            )
+        })
+    )
+    .sort(
+        (a, b) => a.avg == b.avg
+            ? a.wins == 0 && b.wins == 0
+                ? (a.wins + a.losses) - (b.wins + b.losses)
+                : (b.wins + b.losses) - (a.wins + a.losses)
+            : Number.parseFloat(b.avg) - Number.parseFloat(a.avg)
+    )
+;
 
-const getTurnDurations = (games: GameResult[]): Pick<GeneralFacts, "shortestTurn" | "longestTurn"> => {
-    const allTurnDurations = games.flatMap(game => {
-        if (game.turnEndTimestamps.length === 0) {
-            return [];
-        }
+export const getPreviousFighters = (
+    games: GameResult[]
+) => games 
+    .flatMap(
+        x => x.players
+    )
+    .map(
+        x => x.fighter
+    )
+    .filter(
+        (x, i, a) => i == a.findIndex(
+            y => y == x
+        )
+    )
+    .sort(
+        (a, b) => a.localeCompare(b)
+    )
+;
 
-        return [
-            Date.parse(game.turnEndTimestamps[0]) - Date.parse(game.start),
-            ...game.turnEndTimestamps.slice(1).map((timestamp, index) =>
-                Date.parse(timestamp) - Date.parse(game.turnEndTimestamps[index])
-            ),
-        ];
-    });
+export type PlayerFighterCell = {
+    player: string;
+    fighter: string;
+    wins: number;
+    losses: number;
+    games: number;
+};
 
-    if (allTurnDurations.length === 0) {
-        return { shortestTurn: "N/A", longestTurn: "N/A" };
-    }
+export type PlayerFighterMatrix = {
+    players: string[];
+    fighters: string[];
+    cells: PlayerFighterCell[];
+    maxGames: number;
+};
+
+export const getPlayerFighterMatrix = (games: GameResult[]): PlayerFighterMatrix => {
+    const allPlayers = getPreviousPlayers(games);
+    const allFighters = getPreviousFighters(games);
+
+    const cells: PlayerFighterCell[] = allPlayers.flatMap(player =>
+        allFighters.map(fighter => {
+            const matching = games.filter(g =>
+                g.players.some(p => p.name === player && p.fighter === fighter)
+            );
+            const wins = matching.filter(g => g.winner === player).length;
+            return { player, fighter, wins, losses: matching.length - wins, games: matching.length };
+        })
+    );
+
+    const maxGames = Math.max(...cells.map(c => c.games), 1);
 
     return {
-        shortestTurn: formatDuration(Math.min(...allTurnDurations)),
-        longestTurn: formatDuration(Math.max(...allTurnDurations)),
+        players: [...allPlayers].sort((a, b) => a.localeCompare(b)),
+        fighters: [...allFighters].sort((a, b) => a.localeCompare(b)),
+        cells,
+        maxGames,
     };
 };
+
+//
+// Helper funcs...
+//
+const getFighterLeaderboardEntry = (
+    games: GameResult[],
+    fighter: string,
+): LeaderboardEntry => {
+
+    const countOfWins = games.filter(
+        x => x.players.some(
+            y => y.fighter == fighter && y.name == x.winner
+        )
+    ).length;
+
+    const totalGames = games.filter(
+        x => x.players.some(
+            y => y.fighter == fighter
+        )
+    ).length;
+
+    const avg = totalGames > 0
+        ? countOfWins / totalGames
+        : 0
+    ;
+
+    return {
+        wins: countOfWins,
+        losses: totalGames - countOfWins,
+        avg: `${avg.toFixed(3)}`,
+        name: fighter,
+    };
+};
+
+//
+const formatGameDuration = durationFormatter<string>();
 
 const formatLastPlayed = durationFormatter<string>(
     {
@@ -173,7 +254,7 @@ const getLeaderboardEntry = (
 
     const totalGames = games.filter(
         x => x.players.some(
-            y => y == player
+            y => y.name == player
         )
     ).length;
 
@@ -187,7 +268,6 @@ const getLeaderboardEntry = (
         losses: totalGames - countOfWins,
         avg: `${avg.toFixed(3)}`,
         name: player
+
     };
 };
-
-

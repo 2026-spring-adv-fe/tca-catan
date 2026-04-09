@@ -1,16 +1,17 @@
 import { useNavigate } from "react-router";
-import type { GameResult } from "./GameResults";
+import type { GameResult, Player } from "./GameResults";
 import { useEffect, useState } from "react";
 
 type PlayProps = {
     addNewGameResult: (g: GameResult) => void;
     setTitle: (t: string) => void;
-    players: string[];
-}
+    players: Player[];
+};
+
 export const Play: React.FC<PlayProps> = ({
     addNewGameResult,
     setTitle,
-    players
+    players,
 }) => {
 
     useEffect(
@@ -22,73 +23,41 @@ export const Play: React.FC<PlayProps> = ({
     const nav = useNavigate();
     const [startTimestamp] = useState(new Date().toISOString());
 
-    const [turnNumber, setTurnNumber] = useState(1);
-
     // Then return JSX...
     return (
         <>
-            <p 
-                className="text-lg font-bold inline"
-            >
-                {
-                    `Turn #${turnNumber}`
-                }
-
-            </p>
-            <button 
-                className={`btn btn-outline btn-sm mx-2`}
-                disabled={turnNumber === 1}
-                // onClick={() => setTurnNumber(
-                //     turnNumber > 1 
-                //         ? turnNumber - 1
-                //         : turnNumber
-                //     // Math.max(
-                //     //     turnNumber - 1,
-                //     //     1,
-                //     // )
-                // )}
-                onClick={
-                    () => {
-                        if (turnNumber > 0) {
-                            setTurnNumber(turnNumber - 1);
+            <div className="card bg-base-100 w-full shadow-lg my-2">
+                <div className="card-body p-4 sm:p-6">
+                    <h2 className="card-title">Game Over</h2>
+                    <div className="flex flex-col gap-2 mt-2">
+                        {
+                            players.map(
+                                x => (
+                                    <button 
+                                        key={x.name}
+                                        className="btn btn-primary btn-lg w-full lg:w-64"
+                                        onClick={
+                                            () => {
+                                                addNewGameResult({
+                                                    winner: x.name,
+                                                    players: players,
+                                                    start: startTimestamp,
+                                                    end: new Date().toISOString(),
+                                                });
+                                                nav(-2);
+                                            }
+                                        }
+                                    >
+                                        {
+                                            `${x.name} (${x.fighter}) Won`
+                                        }
+                                    </button>
+                                )
+                            )
                         }
-                    }
-                }
-            >
-                -
-            </button>
-            <button 
-                className="btn btn-outline btn-sm mx-2"
-                onClick={() => setTurnNumber(turnNumber + 1)}
-            >
-                +
-            </button>
-            {
-                players.map(
-                    x => (
-                        <button
-                            key={x}
-                            className="btn btn-soft btn-lg w-full lg:w-64 mb-2"
-                            onClick={
-                                () => {
-                                    addNewGameResult({
-                                        winner: x,
-                                        players: players,
-                                        start: startTimestamp,
-                                        end: new Date().toISOString(),
-                                        turnCount: turnNumber,
-                                    });
-                                    nav(-2);
-                                }
-                            }
-                        >
-                            {
-                                `${x} Won `
-                            }
-                        </button>
-                    )
-                )
-            }
+                    </div>
+                </div>
+            </div>
         </>
     );
 };
